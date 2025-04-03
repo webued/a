@@ -1,0 +1,323 @@
+exp-4-calculator
+app.js
+import React, { useState } from "react";
+import "./App.css";
+
+function App() {
+  const [input, setInput] = useState("");
+
+  const handleClick = (value) => {
+    setInput(input + value);
+  };
+
+  const clearInput = () => {
+    setInput("");
+  };
+
+  const calculateResult = () => {
+    try {
+      setInput(eval(input).toString()); // Evaluates the expression
+    } catch (error) {
+      setInput("Error");
+    }
+  };
+
+  return (
+    <div className="calculator">
+      <h2>React Calculator</h2>
+      <input type="text" value={input} readOnly />
+      <div className="buttons">
+        {["7", "8", "9", "/", "4", "5", "6", "*", "1", "2", "3", "-", "0", ".", "=", "+"].map((btn) =>
+          btn === "=" ? (
+            <button key={btn} onClick={calculateResult}>{btn}</button>
+          ) : (
+            <button key={btn} onClick={() => handleClick(btn)}>{btn}</button>
+          )
+        )}
+        <button className="clear" onClick={clearInput}>C</button>
+      </div>
+    </div>
+  );
+}
+
+export default App;
+
+app.css
+.calculator {
+  width: 300px;
+  margin: 50px auto;
+  text-align: center;
+  padding: 20px;
+  background: #f4f4f4;
+  border-radius: 10px;
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+input {
+  width: 90%;
+  padding: 10px;
+  font-size: 20px;
+  text-align: right;
+  margin-bottom: 10px;
+  border: 1px solid #ccc;
+}
+
+.buttons {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 5px;
+}
+
+button {
+  padding: 15px;
+  font-size: 18px;
+  border: none;
+  cursor: pointer;
+  background: #ddd;
+  transition: 0.3s;
+}
+
+button:hover {
+  background: #bbb;
+}
+
+.clear {
+  background: red;
+  color: white;
+  grid-column: span 4;
+}
+
+
+===========================
+exp=5
+voting app
+
+app.js
+import React, { useState } from "react";
+import "./App.css";
+
+function App() {
+  const candidates = ["Alice", "Bob", "Charlie"];
+  const [votes, setVotes] = useState({ Alice: 0, Bob: 0, Charlie: 0 });
+
+  const handleVote = (candidate) => {
+    setVotes({ ...votes, [candidate]: votes[candidate] + 1 });
+  };
+
+  return (
+    <div className="voting-app">
+      <h2>Voting Application</h2>
+      <div className="candidates">
+        {candidates.map((candidate) => (
+          <div key={candidate} className="candidate">
+            <h3>{candidate}</h3>
+            <p>Votes: {votes[candidate]}</p>
+            <button onClick={() => handleVote(candidate)}>Vote</button>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+export default App;
+
+app.css
+.voting-app {
+  width: 350px;
+  margin: 50px auto;
+  text-align: center;
+  padding: 20px;
+  background: #f4f4f4;
+  border-radius: 10px;
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.candidates {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.candidate {
+  background: #fff;
+  padding: 10px;
+  border-radius: 5px;
+  box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+button {
+  background-color: #28a745;
+  color: white;
+  border: none;
+  padding: 8px;
+  cursor: pointer;
+  border-radius: 5px;
+}
+
+button:hover {
+  background-color: #218838;
+}
+==============================
+exp7
+birthday reminder
+app.js
+import React, { useState, useEffect } from "react";
+import "./App.css";
+
+const BirthdayReminder = () => {
+  const [birthdays, setBirthdays] = useState([
+    { id: 1, name: "John Doe", date: "2024-03-10" },
+    { id: 2, name: "Jane Smith", date: "2024-05-15" },
+  ]);
+
+  const [newName, setNewName] = useState("");
+  const [newDate, setNewDate] = useState("");
+  const [popup, setPopup] = useState(null);
+
+  // Function to add a new birthday
+  const addBirthday = () => {
+    if (newName && newDate) {
+      setBirthdays([...birthdays, { id: Date.now(), name: newName, date: newDate }]);
+      setNewName("");
+      setNewDate("");
+    }
+  };
+
+  // Function to remove a birthday
+  const removeBirthday = (id) => {
+    setBirthdays(birthdays.filter((bday) => bday.id !== id));
+  };
+
+  // Function to check if a birthday has passed
+  const processBirthdays = () => {
+    const today = new Date();
+    let updatedBirthdays = birthdays.map((bday) => {
+      let bdayDate = new Date(bday.date);
+      if (bdayDate < today) {
+        bdayDate.setFullYear(today.getFullYear() + 1);
+      }
+      return { ...bday, date: bdayDate.toISOString().split("T")[0] };
+    });
+
+    setBirthdays(updatedBirthdays);
+  };
+
+  // Show pop-up for upcoming birthdays
+  useEffect(() => {
+    const today = new Date().toISOString().split("T")[0];
+    const upcomingBday = birthdays.find((bday) => bday.date === today);
+    if (upcomingBday) {
+      setPopup(`🎉 Happy Birthday ${upcomingBday.name}!`);
+      setTimeout(() => setPopup(null), 3000);
+    }
+  }, [birthdays]);
+
+  return (
+    <div className="app">
+      <h2>🎂 Birthday Reminder</h2>
+
+      {popup && <div className="popup">{popup}</div>}
+
+      <div className="input-container">
+        <input type="text" placeholder="Enter Name" value={newName} onChange={(e) => setNewName(e.target.value)} />
+        <input type="date" value={newDate} onChange={(e) => setNewDate(e.target.value)} />
+        <button onClick={addBirthday}>Add Birthday</button>
+      </div>
+
+      <div className="birthday-list">
+        {birthdays.map((bday) => (
+          <div key={bday.id} className="birthday-item">
+            <span>{bday.name} - {bday.date}</span>
+            <button onClick={() => removeBirthday(bday.id)}>Remove</button>
+          </div>
+        ))}
+      </div>
+
+      <button className="process-btn" onClick={processBirthdays}>Update Birthdays</button>
+    </div>
+  );
+};
+
+export default BirthdayReminder;
+
+app.css
+body {
+  font-family: Arial, sans-serif;
+  background-color: #f8f9fa;
+  text-align: center;
+}
+
+.app {
+  max-width: 400px;
+  margin: 20px auto;
+  background: white;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+}
+
+h2 {
+  color: #007bff;
+}
+
+.input-container {
+  margin-bottom: 20px;
+}
+
+input {
+  padding: 8px;
+  margin: 5px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+}
+
+button {
+  padding: 8px 12px;
+  margin: 5px;
+  border: none;
+  background: #007bff;
+  color: white;
+  cursor: pointer;
+  border-radius: 5px;
+}
+
+button:hover {
+  background: #0056b3;
+}
+
+.birthday-list {
+  text-align: left;
+}
+
+.birthday-item {
+  display: flex;
+  justify-content: space-between;
+  background: #f1f1f1;
+  padding: 10px;
+  margin: 5px 0;
+  border-radius: 5px;
+}
+
+.process-btn {
+  background: #28a745;
+}
+
+.process-btn:hover {
+  background: #218838;
+}
+
+.popup {
+  background: #ff9800;
+  color: white;
+  padding: 10px;
+  margin: 10px;
+  border-radius: 5px;
+  animation: fadein 1s;
+}
+
+@keyframes fadein {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
